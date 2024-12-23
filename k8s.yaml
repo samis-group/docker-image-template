@@ -1,0 +1,79 @@
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.devbu.io/external-secrets.io/externalsecret_v1beta1.json
+apiVersion: external-secrets.io/v1beta1
+kind: ExternalSecret
+metadata:
+  name: example-secrets
+  namespace: default
+spec:
+  secretStoreRef:
+    kind: ClusterSecretStore
+    name: doppler-auth-api
+  target:
+    name: example-secrets
+    creationPolicy: Owner
+  dataFrom:
+    - find:
+        name:
+          regexp: "example"
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: example-volume-claim
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: example
+  namespace: default
+  labels:
+    app: example
+spec:
+  selector:
+    matchLabels:
+      app: example
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: example
+    spec:
+      containers:
+        - name: example
+          image: ghcr.io/samis-group/container-images/ubuntu:latest
+          resources:
+            limits:
+              memory: 512Mi
+              cpu: "1"
+            requests:
+              memory: 256Mi
+              cpu: "0.2"
+          env:
+            - name: TZ
+              valueFrom:
+                secretKeyRef:
+                  name: common-secrets
+                  key: TZ
+            - name: EXAMPLE_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: example-secrets
+                  key: EXAMPLE_SECRET
+            - name: PUID
+              value: '1000'
+            - name: PGID
+              value: '1000'
+          volumeMounts:
+            - mountPath: /config
+              name: example-config
+      volumes:
+        - name: example-config
+          persistentVolumeClaim:
+            claimName: example-volume-claim
