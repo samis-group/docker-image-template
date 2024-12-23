@@ -2,7 +2,7 @@
 
 Docker image for {image_name}. It does what? It uses what tech? More info please.
 
-[![{image_name}](https://github.com/samis-group/docker-image-{image_name}/actions/workflows/{image_name}.yaml/badge.svg)](https://github.com/samis-group/docker-image-{image_name}/actions/workflows/{image_name}.yaml)
+[![Docker Image - {image_name}](https://github.com/samis-group/docker-image-{image_name}/actions/workflows/build-image.yaml/badge.svg)](https://github.com/samis-group/docker-image-{image_name}/actions/workflows/build-image.yaml)
 
 ## Testing Images Locally - Development Workflow
 
