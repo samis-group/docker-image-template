@@ -3,24 +3,24 @@
 apiVersion: external-secrets.io/v1beta1
 kind: ExternalSecret
 metadata:
-  name: example-secrets
+  name: {image_name}-secrets
   namespace: default
 spec:
   secretStoreRef:
     kind: ClusterSecretStore
     name: doppler-auth-api
   target:
-    name: example-secrets
+    name: {image_name}-secrets
     creationPolicy: Owner
   dataFrom:
     - find:
         name:
-          regexp: "example"
+          regexp: "{image_name}"
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: example-volume-claim
+  name: {image_name}-volume-claim
 spec:
   accessModes:
     - ReadWriteOnce
@@ -31,23 +31,23 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: example
+  name: {image_name}
   namespace: default
   labels:
-    app: example
+    app: {image_name}
 spec:
   selector:
     matchLabels:
-      app: example
+      app: {image_name}
   replicas: 1
   template:
     metadata:
       labels:
-        app: example
+        app: {image_name}
     spec:
       containers:
-        - name: example
-          image: ghcr.io/samis-group/container-images/ubuntu:latest
+        - name: {image_name}
+          image: ghcr.io/samis-group/docker-image-{image_name}/{image_name}:latest
           resources:
             limits:
               memory: 512Mi
@@ -61,19 +61,19 @@ spec:
                 secretKeyRef:
                   name: common-secrets
                   key: TZ
-            - name: EXAMPLE_SECRET
+            - name: {image_name}_SECRET
               valueFrom:
                 secretKeyRef:
-                  name: example-secrets
-                  key: EXAMPLE_SECRET
+                  name: {image_name}-secrets
+                  key: {image_name}_SECRET
             - name: PUID
               value: '1000'
             - name: PGID
               value: '1000'
           volumeMounts:
             - mountPath: /config
-              name: example-config
+              name: {image_name}-config
       volumes:
-        - name: example-config
+        - name: {image_name}-config
           persistentVolumeClaim:
-            claimName: example-volume-claim
+            claimName: {image_name}-volume-claim
