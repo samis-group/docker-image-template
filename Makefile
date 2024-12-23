@@ -1,5 +1,5 @@
 # Default make target specified here
-.DEFAULT_GOAL := setup
+.DEFAULT_GOAL := {image_name}
 
 # Command Varaibles
 docker_run_cmd = docker run
@@ -19,76 +19,76 @@ cleanup:
 ###---------------###
 ### Build and Run ###
 ###---------------###
-{image_name}: export name={image_name}_local
-{image_name}: export local_port={image_port_external}
-{image_name}: export app_port={image_port_internal}
-{image_name}: export docker_flags= -d -p $(local_port):$(app_port) \
+{image_name}: name={image_name}_local
+{image_name}: local_port={image_port_external}
+{image_name}: app_port={image_port_internal}
+{image_name}: docker_flags= -d -p $(local_port):$(app_port) \
   -v "${PWD}/assets:/var/lib/assets" \
 	--env VAR1=VAL1
 ### Optionals
 # Set the `image_name` if you want to run a container from a dockerhub public image.
-# {image_name}: export image_name=b4bz/homer
+# {image_name}: image_name=b4bz/homer
 # Set this if you want to override the Dockerfile defined above as default (useful for running a dev version of the image)
-# {image_name}: export dockerfile=Dockerfile.new
+# {image_name}: dockerfile=Dockerfile.new
 # Pass build flags
-# {image_name}-no-cache: export docker_build_flags= --no-cache 
+# {image_name}-no-cache: docker_build_flags= --no-cache 
 ### Build and Run the image
 {image_name}: setup env-setup docker-build-{image_name} docker-run-{image_name} what-is-url
 
 ###------------------------###
 ### Build and Run No-Cache ###
 ###------------------------###
-{image_name}-no-cache: export name={image_name}_local
-{image_name}-no-cache: export local_port={image_port_external}
-{image_name}-no-cache: export app_port={image_port_internal}
-{image_name}-no-cache: export docker_flags= -d -p $(local_port):$(app_port) \
+{image_name}-no-cache: name={image_name}_local
+{image_name}-no-cache: local_port={image_port_external}
+{image_name}-no-cache: app_port={image_port_internal}
+{image_name}-no-cache: docker_flags= -d -p $(local_port):$(app_port) \
   -v "${PWD}/assets:/var/lib/assets" \
 	--env VAR1=VAL1
 ### Optionals
 # Set the `image_name` if you want to run a container from a dockerhub public image.
-# {image_name}-no-cache: export image_name=b4bz/homer
+# {image_name}-no-cache: image_name=b4bz/homer
 # Set this if you want to override the Dockerfile defined above as default (useful for running a dev version of the image)
-# {image_name}-no-cache: export dockerfile=Dockerfile.new
+# {image_name}-no-cache: dockerfile=Dockerfile.new
 # Pass build flags
-# {image_name}-no-cache: export docker_build_flags= --no-cache 
+# {image_name}-no-cache: docker_build_flags= --no-cache 
 ### Build and Run the image
 {image_name}-no-cache: setup env-setup docker-build-no-cache-{image_name} docker-run-{image_name} what-is-url
 
 ###--------------------------###
 ### Build and Run Dev Target ###
 ###--------------------------###
-{image_name}-dev: export name={image_name}_local
-{image_name}-dev: export local_port={image_port_external}
-{image_name}-dev: export app_port={image_port_internal}
-{image_name}-dev: export docker_flags= -d -p $(local_port):$(app_port) \
+{image_name}-dev: name={image_name}_local
+{image_name}-dev: local_port={image_port_external}
+{image_name}-dev: app_port={image_port_internal}
+{image_name}-dev: docker_flags= -d -p $(local_port):$(app_port) \
   -v "${PWD}/assets:/var/lib/assets" \
 	--env VAR1=VAL1
 ### Optionals
 # Set the `image_name` if you want to run a container from a dockerhub public image.
-# {image_name}-dev: export image_name=b4bz/homer
+# {image_name}-dev: image_name=b4bz/homer
 # Set this if you want to override the Dockerfile defined above as default (useful for running a dev version of the image)
-# {image_name}-dev: export dockerfile=Dockerfile.new
+# {image_name}-dev: dockerfile=Dockerfile.new
 # Pass build flags
-# {image_name}-dev: export docker_build_flags= --no-cache 
+# {image_name}-dev: docker_build_flags= --no-cache 
 ### Build and Run the image
 {image_name}-dev: setup env-setup docker-build-dev-{image_name} docker-run-{image_name} what-is-url
 
 ###---------------------------###
 ### Build and Run Prod Target ###
 ###---------------------------###
-{image_name}-prod: export name={image_name}_local
-{image_name}-prod: export local_port={image_port_external}
-{image_name}-prod: export app_port={image_port_internal}
-{image_name}-prod: export docker_flags= -d -p $(local_port):$(app_port) \
+{image_name}-prod: name={image_name}_local
+{image_name}-prod: local_port={image_port_external}
+{image_name}-prod: app_port={image_port_internal}
+{image_name}-prod: docker_flags= -d -p $(local_port):$(app_port) \
   -v "${PWD}/assets:/var/lib/assets" \
 	--env VAR1=VAL1
 ### Optionals
 # Set the `image_name` if you want to run a container from a dockerhub public image.
-# {image_name}-prod: export image_name=b4bz/homer
+# {image_name}-prod: image_name=b4bz/homer
 # Set this if you want to override the Dockerfile defined above as default (useful for running a dev version of the image)
-# {image_name}-prod: export dockerfile=Dockerfile.new
+# {image_name}-prod: dockerfile=Dockerfile.new
 # Pass build flags
-# {image_name}-prod: export docker_build_flags= --no-cache 
+# {image_name}-prod: docker_build_flags= --no-cache 
 ### Build and Run the image
 {image_name}-prod: setup env-setup docker-build-prod-{image_name} docker-run-{image_name} what-is-url
 
@@ -96,7 +96,7 @@ cleanup:
 ### Compose ###
 ###---------###
 ### Optional: If you want to pass flags to docker compose
-# {image_name}-compose-up: export compose_flags= --env-file .env 
+# {image_name}-compose-up: compose_flags= --env-file .env 
 {image_name}-compose-up: setup env-setup compose-up-{image_name}
 {image_name}-compose-down: compose-down-{image_name}
 
@@ -118,13 +118,13 @@ cleanup:
 ###-----------------###
 ### Execute Command ###
 ###-----------------###
-{image_name}-exec: export name={image_name}_local
+{image_name}-exec: name={image_name}_local
 {image_name}-exec: exec-command-{image_name}
 
 ###------------------###
 ### Delete Container ###
 ###------------------###
-{image_name}-rm: export name={image_name}_local
+{image_name}-rm: name={image_name}_local
 {image_name}-rm: rm-{image_name}
 
 ###--------------###
@@ -141,16 +141,16 @@ docker-run-%:
 	${docker_run_cmd} $(docker_flags) --name $(name) $(if $(strip $(image_name)), $(image_name), $(name))
 
 docker-build-%:
-	docker build -t $(name) $(docker_build_flags) -f $(dockerfile)
+	docker build -t $(name) $(docker_build_flags) -f $(dockerfile) .
 
 docker-build-dev-%:
-	docker build --target=dev -t $(name) $(docker_build_flags) -f $(dockerfile)
+	docker build --target=dev -t $(name) $(docker_build_flags) -f $(dockerfile) .
 
 docker-build-prod-%:
-	docker build --target=prod -t $(name) $(docker_build_flags) -f $(dockerfile)
+	docker build --target=prod -t $(name) $(docker_build_flags) -f $(dockerfile) .
 
 docker-build-no-cache-%:
-	docker build --no-cache -t $(name) $(docker_build_flags) -f $(dockerfile)
+	docker build --no-cache -t $(name) $(docker_build_flags) -f $(dockerfile) .
 
 what-is-url:
 	@echo "!!! Go here dummy --> http://localhost:$(local_port)/ !!!"
