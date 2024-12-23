@@ -1,0 +1,108 @@
+---
+# https://taskfile.dev/usage/
+# https://github.com/go-task/task
+
+version: "3"
+
+set: [pipefail]
+# shopt: [globstar]
+
+vars:
+  PROJECT_DIR:
+    sh: git rev-parse --show-toplevel
+  GIT_PARENT_DIR:
+    sh: dirname $(git rev-parse --show-toplevel)
+  LOCAL_CONTAINER_NAME: {image_name}
+  REGISTRY_CONTAINER_REPO_URL: ghcr.io/samis-group/docker-image-{image_name}/{image_name}:latest
+  # Docker run command examples
+  DOCKER_PORTS: -p {image_port_external}:{image_port_internal}
+  DOCKER_MOUNTS: -v "{{ .GIT_PARENT_DIR }}/docker/mount/file.yml:/etc/file.yml" -v "{{ .GIT_PARENT_DIR }}/docker/mount/dir1/:/etc/dir1"
+  DOCKER_RUN_CMD: docker run --name {{ .LOCAL_CONTAINER_NAME }} {{ .DOCKER_PORTS }} {{ .DOCKER_MOUNTS }}
+  DOCKER_RUN_RM_CMD: docker run --rm --name {{ .LOCAL_CONTAINER_NAME }} {{ .DOCKER_PORTS }} {{ .DOCKER_MOUNTS }}
+
+# Example ENV
+# env:
+#   PATH: "{{.PATH}}:{{.PROJECT_DIR}}/bin"  # add project bin to path
+
+tasks:
+
+  ###################
+  ### Build tasks ###
+  ###################
+
+  docker-build:
+    desc: Build docker image
+    aliases: ["db"]
+    internal: true
+    cmds:
+      - docker build -t {{ .LOCAL_CONTAINER_NAME }} -f Dockerfile .
+
+  docker-build-no-cache:
+    desc: Build docker image
+    aliases: ["dbnc"]
+    internal: true
+    cmds:
+      - docker build --no-cache -t {{ .LOCAL_CONTAINER_NAME }} -f Dockerfile .
+
+  #################
+  ### Run tasks ###
+  #################
+
+  docker-run:
+    desc: Run container
+    aliases: ["dr"]
+    deps: ['docker-build']
+    cmds:
+      - "{{ .DOCKER_RUN_CMD }} -d {{ .LOCAL_CONTAINER_NAME }}"
+      - task: echo-link # If ports exist
+
+  docker-run-attached:
+    desc: Run container - keep shell attached to container
+    aliases: ["dra"]
+    deps: ['docker-build']
+    cmds:
+      - "{{ .DOCKER_RUN_CMD }} {{ .LOCAL_CONTAINER_NAME }}"
+      - task: echo-link # If ports exist
+
+  docker-run-registry:
+    desc: Build from using registry image instead of building locally
+    aliases: ["drr"]
+    cmds:
+      - "{{ .DOCKER_RUN_CMD }} -d {{ .REGISTRY_CONTAINER_REPO_URL }}"
+      - task: echo-link # If ports exist
+
+  docker-run-registry-attached:
+    desc: Build from using registry image instead of building locally - keep shell attached to container
+    aliases: ["drra"]
+    deps: ['docker-build']
+    cmds:
+      - "{{ .DOCKER_RUN_CMD }} {{ .LOCAL_CONTAINER_NAME }}"
+      - task: echo-link # If ports exist
+
+  #####################
+  ### Cleanup tasks ###
+  #####################
+
+  cleanup:
+    desc: Cleanup container and image
+    aliases: ["c"]
+    cmds:
+      - docker stop {{ .LOCAL_CONTAINER_NAME }}
+      - docker rmi {{ .LOCAL_CONTAINER_NAME }}
+
+  #################
+  ### Aux tasks ###
+  #################
+
+  echo-link:
+    desc: Echo link to container UI
+    internal: true
+    silent: true
+    cmds:
+      - echo "!!! Go here dummy --> http://localhost:{image_port_external}/ !!!"
+
+  docker-login:
+    desc: Login to github container registry
+    aliases: ["l"]
+    cmds:
+      - docker login ghcr.io

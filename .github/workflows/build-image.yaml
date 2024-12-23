@@ -1,0 +1,20 @@
+name: Docker Image - {image_name}
+
+on:
+  push:
+    paths:
+      - "assets/**"
+      - "Dockerfile"
+    branches:
+      - 'main'
+  workflow_dispatch:
+  pull_request:
+    branches:
+      - 'main'
+
+jobs:
+  build:
+    uses: samis-group/actions-workflows/.github/workflows/docker-build-and-publish.yaml@main
+    with:
+      image_name: {image_name}
+      # build_target: prod
